@@ -1,0 +1,221 @@
+import os, sys 
+from PyQt4 import QtGui, QtCore 
+import collections
+import elgamal
+import elliptic
+import basicfunc
+
+class MainWindow(QtGui.QWidget): 
+    def __init__(self): 
+        QtGui.QWidget.__init__(self) 
+
+        #Window propoerties         
+        self.setGeometry(0,0,500,550) 
+        self.setWindowTitle("Elliptic Curve Cryptography - ElGamal") 
+        self.setWindowIcon(QtGui.QIcon("icon.png")) 
+        self.resize(500,550) 
+        self.setMinimumSize(500,550) 
+        self.center() 
+         
+        #Tabs in the GUI
+        self.tab_widget = QtGui.QTabWidget() 
+        #For encryption
+        tab1 = QtGui.QWidget()
+        #For decryption
+        tab2 = QtGui.QWidget()
+        #For defining curve
+        tab0 = QtGui.QWidget()
+
+        #Layouts for tabs
+        p0_vertical = QtGui.QVBoxLayout(tab0)
+        p1_vertical = QtGui.QVBoxLayout(tab1) 
+        p2_vertical = QtGui.QVBoxLayout(tab2)
+        
+        #add tabs, name them
+        self.tab_widget.addTab(tab0, "Curve")
+        self.tab_widget.addTab(tab1, "Encrypt") 
+        self.tab_widget.addTab(tab2, "Decrypt")
+
+        #labels for Tab 1
+        eqn_label = QtGui.QLabel("Equation : (y^2)mod q = (x^3 + ax + b)mod q ")
+        eqn_label.setMinimumHeight(50)
+        eqn_label.setAlignment(QtCore.Qt.AlignCenter)
+        eqn_label.setFont(QtGui.QFont('Decorative', 13))
+
+        label_a = QtGui.QLabel("Enter value of a:")
+        label_b = QtGui.QLabel("Enter value of b:")
+        label_c = QtGui.QLabel("Enter value of q:")
+        label_priv = QtGui.QLabel("Enter the private key:")
+        label_message = QtGui.QLabel("Enter the message you want to encrypt:")
+        label_pub = QtGui.QLabel("Enter public key of recipient:")
+        label_encrypted = QtGui.QLabel("The encrypted data is:")
+        label_decrypted = QtGui.QLabel("The decrypted data is:")
+        publickey = QtGui.QLabel("The public key is:")
+
+        #Textboxes for Tab 1  
+        self.val_a = QtGui.QTextEdit()
+        self.val_b = QtGui.QTextEdit()
+        self.val_c = QtGui.QTextEdit()
+        self.val_priv = QtGui.QTextEdit()
+        self.msg_val = QtGui.QTextEdit()
+        self.val_pub = QtGui.QTextEdit()
+        self.public = QtGui.QTextEdit()
+        self.encrypted_string = QtGui.QTextEdit()
+        self.decrypted_string = QtGui.QTextEdit()
+
+        #button for curve generation, accompanying Label
+        button = QtGui.QPushButton("Generate Curve")
+        button.clicked.connect(self.generate_stuff)
+
+        button_enc = QtGui.QPushButton("Encrypt Data")
+        button_enc.clicked.connect(self.encrypt_data)
+
+        #add elements to Tab 1
+        p0_vertical.addWidget(eqn_label)
+        p0_vertical.addWidget(label_a)
+        p0_vertical.addWidget(self.val_a)
+        p0_vertical.addWidget(label_b)
+        p0_vertical.addWidget(self.val_b)
+        p0_vertical.addWidget(label_c)
+        p0_vertical.addWidget(self.val_c)
+        p0_vertical.addWidget(label_priv)
+        p0_vertical.addWidget(self.val_priv) 
+        p0_vertical.addWidget(button)
+        p0_vertical.addWidget(publickey)
+        p0_vertical.addWidget(self.public)
+        p0_vertical.addStretch(1)
+
+        p1_vertical.addWidget(label_pub)
+        p1_vertical.addWidget(self.val_pub)
+        p1_vertical.addWidget(label_message)
+        p1_vertical.addWidget(self.msg_val)
+        p1_vertical.addWidget(button_enc)
+        p1_vertical.addWidget(label_encrypted)
+        p1_vertical.addWidget(self.encrypted_string)
+        p1_vertical.addStretch(1)
+
+        #Labels for Tab 2
+        label_key = QtGui.QLabel("Enter your private key:")
+        label_enc_message = QtGui.QLabel("Enter the Encrypted message:")
+
+        #Buttons for Tab 2
+        button_dec = QtGui.QPushButton("Decrypt Data")
+        button_dec.clicked.connect(self.decrypt_data)
+
+        #Textboxes for Tab 2
+        self.priv_key = QtGui.QTextEdit()
+        self.encrypted_data = QtGui.QTextEdit()
+
+        #Set height for textboxes
+        self.val_a.setMaximumHeight(label_a.sizeHint().height()*2)
+        self.val_b.setMaximumHeight(label_b.sizeHint().height()*2)
+        self.val_c.setMaximumHeight(label_c.sizeHint().height()*2)
+        self.val_priv.setMaximumHeight(label_c.sizeHint().height()*2)
+        self.msg_val.setMaximumHeight(label_c.sizeHint().height()*6)
+        self.public.setMaximumHeight(label_b.sizeHint().height()*2)
+        self.val_pub.setMaximumHeight(label_priv.sizeHint().height()*2)
+        self.priv_key.setMaximumHeight(label_priv.sizeHint().height()*2)
+        self.encrypted_data.setMaximumHeight(label_priv.sizeHint().height()*6)
+        self.encrypted_string.setMaximumHeight(label_priv.sizeHint().height()*6)
+        self.encrypted_string.setMaximumHeight(label_priv.sizeHint().height()*6)
+
+        
+        #Adding widgets to Tab 2
+        p2_vertical.addWidget(label_key)
+        p2_vertical.addWidget(self.priv_key)
+        p2_vertical.addWidget(label_enc_message)
+        p2_vertical.addWidget(self.encrypted_data)
+        p2_vertical.addWidget(button_dec)
+        p2_vertical.addWidget(label_decrypted)
+        p2_vertical.addWidget(self.decrypted_string)
+        p2_vertical.addStretch(1)
+
+
+        vbox = QtGui.QVBoxLayout() 
+        vbox.addWidget(self.tab_widget) 
+         
+        self.setLayout(vbox) 
+     
+    def generate_stuff(self):
+        global a
+        a = int(self.val_a.toPlainText())
+        global b
+        b = int(self.val_b.toPlainText())
+        global q
+        q = int(self.val_c.toPlainText())
+        global priv
+        priv = int(self.val_priv.toPlainText())
+        global ec
+        ec = elliptic.EC(a, b, q)
+        global g
+        for i in range(1,q):
+            g, _ = ec.at(i)
+            if g is not False and ec.order(g) <= ec.q and ec.order(g) > 127:
+                #print ec.order(g)
+                break
+        #print "Over"
+        global eg
+        eg = elgamal.ElGamal(ec, g)
+        global pub
+        pub = eg.gen(priv,g)
+        self.public.setText(str(pub[0]) + " " + str(pub[1]))
+        global mapping
+        mapping = [ec.mul(g, i) for i in range(eg.n)]
+
+    def encrypt_data(self):
+        pub_raw = str(self.val_pub.toPlainText())
+        pub1_list = pub_raw.split()
+        pub1 = int(pub1_list[0])
+        pub2 = int(pub1_list[1])
+        pub = basicfunc.Coord(pub1,pub2)
+        message = self.msg_val.toPlainText()
+
+        mapped = []
+        for char in message:
+            mapped.append(mapping[ord(str(char))])
+
+        cipher = []
+        for plain in mapped:
+            cipher.append(eg.enc(plain, pub, g, 15))
+
+        enc_text = []
+        for single in cipher:
+            enc_text.append(str(single[0][0]))
+            enc_text.append(str(single[0][1]))
+            enc_text.append(str(single[1][0]))
+            enc_text.append(str(single[1][1]))
+
+        self.encrypted_string.setText(" ".join(enc_text))
+
+    def decrypt_data(self):
+        private_key = int(self.priv_key.toPlainText())
+        cipher_raw = str(self.encrypted_data.toPlainText())
+        cipher_raw_list = cipher_raw.split()
+        cipher_super = []
+        cipher_final = []
+        decrypted = []
+        for i,k in zip(cipher_raw_list[0::2], cipher_raw_list[1::2]):
+            cipher_super.append(basicfunc.Coord(int(i), int(k)))
+
+        for i,k in zip(cipher_super[0::2], cipher_super[1::2]):
+            cipher_final.append((i,k))
+
+        for ciphers in cipher_final:
+            decrypted.append(eg.dec(ciphers, private_key, ec))
+
+        final_dec = []
+        for dec in decrypted:
+            final_dec.append(unichr(mapping.index(dec)))
+
+        self.decrypted_string.setText("".join(final_dec))
+
+    #Start window in the center of the screen
+    def center(self): 
+        screen = QtGui.QDesktopWidget().screenGeometry() 
+        size = self.geometry() 
+        self.move((screen.width()-size.width())/2, (screen.height()-size.height())/2) 
+
+app = QtGui.QApplication(sys.argv) 
+frame = MainWindow() 
+frame.show() 
+sys.exit(app.exec_())
