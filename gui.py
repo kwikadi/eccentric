@@ -137,46 +137,37 @@ class MainWindow(QtGui.QWidget):
         self.setLayout(vbox) 
      
     def generate_stuff(self):
-        global a
-        a = int(self.val_a.toPlainText())
-        global b
-        b = int(self.val_b.toPlainText())
-        global q
-        q = int(self.val_c.toPlainText())
-        global priv
-        priv = int(self.val_priv.toPlainText())
-        global ec
-        ec = elliptic.EC(a, b, q)
-        global g
-        for i in range(1,q):
-            g, _ = ec.at(i)
-            if g is not False and ec.order(g) <= ec.q and ec.order(g) > 127:
+        self.a = int(self.val_a.toPlainText())
+        self.b = int(self.val_b.toPlainText())
+        self.q = int(self.val_c.toPlainText())
+        self.priv = int(self.val_priv.toPlainText())
+        self.ec = elliptic.EC(self.a, self.b, self.q)
+        for i in range(1,self.q):
+            self.g, _ = self.ec.at(i)
+            if self.g is not False and self.ec.order(self.g) <= self.ec.q and self.ec.order(self.g) > 127:
                 #print ec.order(g)
                 break
         #print "Over"
-        global eg
-        eg = elgamal.ElGamal(ec, g)
-        global pub
-        pub = eg.gen(priv,g)
-        self.public.setText(str(pub[0]) + " " + str(pub[1]))
-        global mapping
-        mapping = [ec.mul(g, i) for i in range(eg.n)]
+        self.eg = elgamal.ElGamal(self.ec, self.g)
+        self.pub = self.eg.gen(self.priv,self.g)
+        self.public.setText(str(self.pub[0]) + " " + str(self.pub[1]))
+        self.mapping = [self.ec.mul(self.g, i) for i in range(self.eg.n)]
 
     def encrypt_data(self):
         pub_raw = str(self.val_pub.toPlainText())
         pub1_list = pub_raw.split()
         pub1 = int(pub1_list[0])
         pub2 = int(pub1_list[1])
-        pub = basicfunc.Coord(pub1,pub2)
+        publ = basicfunc.Coord(pub1,pub2)
         message = self.msg_val.toPlainText()
 
         mapped = []
         for char in message:
-            mapped.append(mapping[ord(str(char))])
+            mapped.append(self.mapping[ord(str(char))])
 
         cipher = []
         for plain in mapped:
-            cipher.append(eg.enc(plain, pub, g, 15))
+            cipher.append(self.eg.enc(plain, publ, self.g, 15))
 
         enc_text = []
         for single in cipher:
@@ -201,11 +192,11 @@ class MainWindow(QtGui.QWidget):
             cipher_final.append((i,k))
 
         for ciphers in cipher_final:
-            decrypted.append(eg.dec(ciphers, private_key, ec))
+            decrypted.append(self.eg.dec(ciphers, private_key, self.ec))
 
         final_dec = []
         for dec in decrypted:
-            final_dec.append(unichr(mapping.index(dec)))
+            final_dec.append(unichr(self.mapping.index(dec)))
 
         self.decrypted_string.setText("".join(final_dec))
 
