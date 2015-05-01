@@ -52,6 +52,11 @@ class MainWindow(QtGui.QWidget):
         label_decrypted = QtGui.QLabel("The decrypted data is:")
         publickey = QtGui.QLabel("The public key is:")
 
+        browseButton = QtGui.QPushButton("Browse")
+        browseButton.clicked.connect(self.showDialog)
+        self.destTextField = QtGui.QTextEdit()
+        self.destTextField.setMaximumHeight(label_a.sizeHint().height()*2)
+
         #Textboxes for Tab 1  
         self.val_a = QtGui.QTextEdit()
         self.val_b = QtGui.QTextEdit()
@@ -69,6 +74,19 @@ class MainWindow(QtGui.QWidget):
 
         button_enc = QtGui.QPushButton("Encrypt Data")
         button_enc.clicked.connect(self.encrypt_data)
+
+        hori_box = QtGui.QHBoxLayout()
+        hori_box.addWidget(self.destTextField)
+        hori_box.addWidget(browseButton)
+
+        browseButton2 = QtGui.QPushButton("Browse")
+        browseButton2.clicked.connect(self.showDialog2)
+        self.destTextField2 = QtGui.QTextEdit()
+        self.destTextField2.setMaximumHeight(label_a.sizeHint().height()*2)
+
+        hori_box2 = QtGui.QHBoxLayout()
+        hori_box2.addWidget(self.destTextField2)
+        hori_box2.addWidget(browseButton2)
 
         #add elements to Tab 1
         p0_vertical.addWidget(eqn_label)
@@ -88,6 +106,7 @@ class MainWindow(QtGui.QWidget):
         p1_vertical.addWidget(label_pub)
         p1_vertical.addWidget(self.val_pub)
         p1_vertical.addWidget(label_message)
+        p1_vertical.addLayout(hori_box)
         p1_vertical.addWidget(self.msg_val)
         p1_vertical.addWidget(button_enc)
         p1_vertical.addWidget(label_encrypted)
@@ -124,6 +143,7 @@ class MainWindow(QtGui.QWidget):
         p2_vertical.addWidget(label_key)
         p2_vertical.addWidget(self.priv_key)
         p2_vertical.addWidget(label_enc_message)
+        p2_vertical.addLayout(hori_box2)
         p2_vertical.addWidget(self.encrypted_data)
         p2_vertical.addWidget(button_dec)
         p2_vertical.addWidget(label_decrypted)
@@ -135,7 +155,21 @@ class MainWindow(QtGui.QWidget):
         vbox.addWidget(self.tab_widget) 
          
         self.setLayout(vbox) 
-     
+
+    def showDialog(self):
+        fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', 'C:')
+        f = open(fname, 'r')
+        with f:        
+            data = f.read()
+            self.msg_val.setText(data)
+
+    def showDialog2(self):
+        fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', 'C:')
+        f = open(fname, 'r')
+        with f:        
+            data = f.read()
+            self.encrypted_data.setText(data) 
+    
     def generate_stuff(self):
         self.a = int(self.val_a.toPlainText())
         self.b = int(self.val_b.toPlainText())
