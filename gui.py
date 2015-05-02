@@ -158,6 +158,7 @@ class MainWindow(QtGui.QWidget):
 
     def showDialog(self):
         fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', 'C:')
+        self.destTextField.setPlainText(fname)
         f = open(fname, 'r')
         with f:        
             data = f.read()
@@ -165,6 +166,7 @@ class MainWindow(QtGui.QWidget):
 
     def showDialog2(self):
         fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', 'C:')
+        self.destTextField2.setPlainText(fname)
         f = open(fname, 'r')
         with f:        
             data = f.read()
