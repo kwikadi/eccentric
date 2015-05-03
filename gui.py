@@ -35,6 +35,8 @@ class MainWindow(QtGui.QWidget):
         self.tab_widget.addTab(tab0, "Curve")
         self.tab_widget.addTab(tab1, "Encrypt") 
         self.tab_widget.addTab(tab2, "Decrypt")
+        self.tab_widget.setTabEnabled(1,False)
+        self.tab_widget.setTabEnabled(2,False)
 
         #labels for Tab 1
         eqn_label = QtGui.QLabel("Equation : (y^2)mod q = (x^3 + ax + b)mod q ")
@@ -188,6 +190,8 @@ class MainWindow(QtGui.QWidget):
         self.pub = self.eg.gen(self.priv,self.g)
         self.public.setText(str(self.pub[0]) + " " + str(self.pub[1]))
         self.mapping = [self.ec.mul(self.g, i) for i in range(self.eg.n)]
+        self.tab_widget.setTabEnabled(1,True)
+        self.tab_widget.setTabEnabled(2,True)
 
     def encrypt_data(self):
         pub_raw = str(self.val_pub.toPlainText())
