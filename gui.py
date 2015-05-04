@@ -113,7 +113,7 @@ class MainWindow(QtGui.QWidget):
         p1_vertical.addWidget(button_enc)
         p1_vertical.addWidget(label_encrypted)
         p1_vertical.addWidget(self.encrypted_string)
-        p1_vertical.addStretch(1)
+        #p1_vertical.addStretch(1)
 
         #Labels for Tab 2
         label_key = QtGui.QLabel("Enter your private key:")
@@ -137,8 +137,8 @@ class MainWindow(QtGui.QWidget):
         self.val_pub.setMaximumHeight(label_priv.sizeHint().height()*2)
         self.priv_key.setMaximumHeight(label_priv.sizeHint().height()*2)
         self.encrypted_data.setMaximumHeight(label_priv.sizeHint().height()*6)
-        self.encrypted_string.setMaximumHeight(label_priv.sizeHint().height()*6)
-        self.encrypted_string.setMaximumHeight(label_priv.sizeHint().height()*6)
+        self.encrypted_string.setMaximumHeight(label_priv.sizeHint().height()*20)
+        self.decrypted_string.setMaximumHeight(label_priv.sizeHint().height()*20)
 
         
         #Adding widgets to Tab 2
@@ -150,7 +150,7 @@ class MainWindow(QtGui.QWidget):
         p2_vertical.addWidget(button_dec)
         p2_vertical.addWidget(label_decrypted)
         p2_vertical.addWidget(self.decrypted_string)
-        p2_vertical.addStretch(1)
+        #p2_vertical.addStretch(1)
 
 
         vbox = QtGui.QVBoxLayout() 
@@ -218,6 +218,10 @@ class MainWindow(QtGui.QWidget):
 
         self.encrypted_string.setText(" ".join(enc_text))
 
+        with open('encrypted.txt', 'w+') as f:        
+            f.write(" ".join(enc_text))
+            
+
     def decrypt_data(self):
         private_key = int(self.priv_key.toPlainText())
         cipher_raw = str(self.encrypted_data.toPlainText())
@@ -239,6 +243,9 @@ class MainWindow(QtGui.QWidget):
             final_dec.append(unichr(self.mapping.index(dec)))
 
         self.decrypted_string.setText("".join(final_dec))
+
+        with open('decrypted.txt', 'w+') as f:        
+            f.write("".join(final_dec))
 
     #Start window in the center of the screen
     def center(self): 
