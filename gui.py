@@ -58,6 +58,7 @@ class MainWindow(QtGui.QWidget):
         browseButton.clicked.connect(self.showDialog)
         self.destTextField = QtGui.QTextEdit()
         self.destTextField.setMaximumHeight(label_a.sizeHint().height()*2)
+        self.destTextField.setReadOnly(True)
 
         #Textboxes for Tab 1  
         self.val_a = QtGui.QTextEdit()
@@ -67,6 +68,7 @@ class MainWindow(QtGui.QWidget):
         self.msg_val = QtGui.QTextEdit()
         self.val_pub = QtGui.QTextEdit()
         self.public = QtGui.QTextEdit()
+        self.public.setReadOnly(True)
         self.encrypted_string = QtGui.QTextEdit()
         self.decrypted_string = QtGui.QTextEdit()
 
@@ -85,6 +87,7 @@ class MainWindow(QtGui.QWidget):
         browseButton2.clicked.connect(self.showDialog2)
         self.destTextField2 = QtGui.QTextEdit()
         self.destTextField2.setMaximumHeight(label_a.sizeHint().height()*2)
+        self.destTextField2.setReadOnly(True)
 
         hori_box2 = QtGui.QHBoxLayout()
         hori_box2.addWidget(self.destTextField2)
@@ -200,7 +203,12 @@ class MainWindow(QtGui.QWidget):
         pub2 = int(pub1_list[1])
         publ = basicfunc.Coord(pub1,pub2)
         message = self.msg_val.toPlainText()
-
+        path = 'encrypted.txt'
+        path_acq = str(self.destTextField.toPlainText())
+        if path_acq:
+            index_path = path_acq.rfind(".")
+            if index_path != -1:
+                path = path_acq[:index_path] + ".enc." + path_acq[index_path+1:]
         mapped = []
         for char in message:
             mapped.append(self.mapping[ord(str(char))])
@@ -218,7 +226,7 @@ class MainWindow(QtGui.QWidget):
 
         self.encrypted_string.setText(" ".join(enc_text))
 
-        with open('encrypted.txt', 'w+') as f:        
+        with open(path, 'w+') as f:        
             f.write(" ".join(enc_text))
             
 
@@ -229,6 +237,17 @@ class MainWindow(QtGui.QWidget):
         cipher_super = []
         cipher_final = []
         decrypted = []
+        path_acq = str(self.destTextField2.toPlainText())
+        path = 'decrypted.txt'
+        if path_acq:
+            index_path = path_acq.rfind(".enc")
+            if index_path != -1:
+                path = path_acq[:index_path] + ".dec" + path_acq[index_path+4:]
+            else:
+                index_path = path_acq.rfind(".")
+                if index_path != -1:
+                    path = path_acq[:index_path] + ".dec." + path_acq[index_path+1:]
+
         for i,k in zip(cipher_raw_list[0::2], cipher_raw_list[1::2]):
             cipher_super.append(basicfunc.Coord(int(i), int(k)))
 
@@ -244,7 +263,7 @@ class MainWindow(QtGui.QWidget):
 
         self.decrypted_string.setText("".join(final_dec))
 
-        with open('decrypted.txt', 'w+') as f:        
+        with open(path, 'w+') as f:        
             f.write("".join(final_dec))
 
     #Start window in the center of the screen
