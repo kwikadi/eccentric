@@ -62,15 +62,31 @@ class MainWindow(QtGui.QWidget):
 
         #Textboxes for Tab 1  
         self.val_a = QtGui.QTextEdit()
+        self.val_a.setTabChangesFocus(True)
+
         self.val_b = QtGui.QTextEdit()
+        self.val_b.setTabChangesFocus(True)
+
         self.val_c = QtGui.QTextEdit()
+        self.val_c.setTabChangesFocus(True)
+
         self.val_priv = QtGui.QTextEdit()
+        self.val_priv.setTabChangesFocus(True)
+        
         self.msg_val = QtGui.QTextEdit()
+        self.msg_val.setTabChangesFocus(True)
+
         self.val_pub = QtGui.QTextEdit()
+        self.val_pub.setTabChangesFocus(True)
+
         self.public = QtGui.QTextEdit()
         self.public.setReadOnly(True)
+
         self.encrypted_string = QtGui.QTextEdit()
+        self.encrypted_string.setTabChangesFocus(True)
+
         self.decrypted_string = QtGui.QTextEdit()
+        self.decrypted_string.setTabChangesFocus(True)
 
         #button for curve generation, accompanying Label
         button = QtGui.QPushButton("Generate Curve")
@@ -85,6 +101,7 @@ class MainWindow(QtGui.QWidget):
 
         browseButton2 = QtGui.QPushButton("Browse")
         browseButton2.clicked.connect(self.showDialog2)
+
         self.destTextField2 = QtGui.QTextEdit()
         self.destTextField2.setMaximumHeight(label_a.sizeHint().height()*2)
         self.destTextField2.setReadOnly(True)
@@ -128,7 +145,10 @@ class MainWindow(QtGui.QWidget):
 
         #Textboxes for Tab 2
         self.priv_key = QtGui.QTextEdit()
+        self.priv_key.setTabChangesFocus(True)
+
         self.encrypted_data = QtGui.QTextEdit()
+        self.encrypted_data.setTabChangesFocus(True)
 
         #Set height for textboxes
         self.val_a.setMaximumHeight(label_a.sizeHint().height()*2)
