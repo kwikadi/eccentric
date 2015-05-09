@@ -31,6 +31,9 @@ class MainWindow(QtGui.QWidget):
         p1_vertical = QtGui.QVBoxLayout(tab1) 
         p2_vertical = QtGui.QVBoxLayout(tab2)
         
+        self.bar = QtGui.QStatusBar(self)
+        self.bar.showMessage("Ready. Define curve to begin.")
+
         #add tabs, name them
         self.tab_widget.addTab(tab0, "Curve")
         self.tab_widget.addTab(tab1, "Encrypt") 
@@ -133,7 +136,6 @@ class MainWindow(QtGui.QWidget):
         p1_vertical.addWidget(button_enc)
         p1_vertical.addWidget(label_encrypted)
         p1_vertical.addWidget(self.encrypted_string)
-        #p1_vertical.addStretch(1)
 
         #Labels for Tab 2
         label_key = QtGui.QLabel("Enter your private key:")
@@ -162,7 +164,6 @@ class MainWindow(QtGui.QWidget):
         self.encrypted_data.setMaximumHeight(label_priv.sizeHint().height()*6)
         self.encrypted_string.setMaximumHeight(label_priv.sizeHint().height()*20)
         self.decrypted_string.setMaximumHeight(label_priv.sizeHint().height()*20)
-
         
         #Adding widgets to Tab 2
         p2_vertical.addWidget(label_key)
@@ -173,13 +174,21 @@ class MainWindow(QtGui.QWidget):
         p2_vertical.addWidget(button_dec)
         p2_vertical.addWidget(label_decrypted)
         p2_vertical.addWidget(self.decrypted_string)
-        #p2_vertical.addStretch(1)
 
+        self.tab_widget.currentChanged.connect(self.current_tab_changed)
 
         vbox = QtGui.QVBoxLayout() 
         vbox.addWidget(self.tab_widget) 
-         
+        vbox.addWidget(self.bar)
         self.setLayout(vbox) 
+
+    def current_tab_changed(self):
+        if self.tab_widget.currentIndex() == 1:
+            self.bar.showMessage("Encrypt Tab. Ready.")
+        elif self.tab_widget.currentIndex() == 2:
+            self.bar.showMessage("Decrypt Tab. Ready.")
+        elif self.tab_widget.currentIndex() == 0:
+            self.bar.showMessage("Curve tab. You can define a new curve if you want.")
 
     def showDialog(self):
         fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', 'C:')
@@ -215,8 +224,10 @@ class MainWindow(QtGui.QWidget):
         self.mapping = [self.ec.mul(self.g, i) for i in range(self.eg.n)]
         self.tab_widget.setTabEnabled(1,True)
         self.tab_widget.setTabEnabled(2,True)
+        self.bar.showMessage("Curve defined! Move to Encrypt or Decrypt tabs for more.")
 
     def encrypt_data(self):
+        self.bar.showMessage("Encrypting...")
         pub_raw = str(self.val_pub.toPlainText())
         pub1_list = pub_raw.split()
         pub1 = int(pub1_list[0])
@@ -248,9 +259,13 @@ class MainWindow(QtGui.QWidget):
 
         with open(path, 'w+') as f:        
             f.write(" ".join(enc_text))
+            message_to_show = "Encrypted. File saved at" + path 
+            
+        self.bar.showMessage(message_to_show)
             
 
     def decrypt_data(self):
+        self.bar.showMessage("Decrypting...")
         private_key = int(self.priv_key.toPlainText())
         cipher_raw = str(self.encrypted_data.toPlainText())
         cipher_raw_list = cipher_raw.split()
@@ -285,6 +300,9 @@ class MainWindow(QtGui.QWidget):
 
         with open(path, 'w+') as f:        
             f.write("".join(final_dec))
+            message_to_show = "Decrypted. File saved at " + path 
+            
+        self.bar.showMessage(message_to_show)
 
     #Start window in the center of the screen
     def center(self): 
