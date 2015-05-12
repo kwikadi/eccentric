@@ -1,5 +1,5 @@
-import os, sys 
-from PyQt4 import QtGui, QtCore 
+import os, sys
+from PyQt4 import QtGui, QtCore
 import collections
 import elgamal
 import elliptic
@@ -7,11 +7,11 @@ import basicfunc
 
 class PopupDialog(QtGui.QDialog):
     def __init__(self, parent=None):
-        QtGui.QWidget.__init__(self)   
+        QtGui.QWidget.__init__(self)
         self.initUI()
 
     def initUI(self):
-        
+
         self.label_error = QtGui.QLabel()
         self.label_error.setFont(QtGui.QFont('Decorative', 10))
 
@@ -34,9 +34,9 @@ class PopupDialog(QtGui.QDialog):
         vbox.addLayout(hori)
         vbox.addStretch(1)
         vbox.addLayout(hbox)
-        
-        self.setLayout(vbox)    
-        
+
+        self.setLayout(vbox)
+
         self.setGeometry(300, 300, 270, 150)
         self.setWindowTitle('Error!')
 
@@ -44,20 +44,20 @@ class PopupDialog(QtGui.QDialog):
         self.label_error.setText(errorval)
 
 
-class MainWindow(QtGui.QWidget): 
-    def __init__(self): 
-        QtGui.QWidget.__init__(self) 
+class MainWindow(QtGui.QWidget):
+    def __init__(self):
+        QtGui.QWidget.__init__(self)
 
-        #Window propoerties         
-        self.setGeometry(0,0,500,550) 
-        self.setWindowTitle("Elliptic Curve Cryptography - ElGamal") 
-        self.setWindowIcon(QtGui.QIcon("icon.png")) 
-        self.resize(500,550) 
-        self.setMinimumSize(500,550) 
-        center(self) 
+        #Window propoerties
+        self.setGeometry(0,0,500,550)
+        self.setWindowTitle("Elliptic Curve Cryptography - ElGamal")
+        self.setWindowIcon(QtGui.QIcon("icon.png"))
+        self.resize(500,550)
+        self.setMinimumSize(500,550)
+        center(self)
          
         #Tabs in the GUI
-        self.tab_widget = QtGui.QTabWidget() 
+        self.tab_widget = QtGui.QTabWidget()
         #For encryption
         tab1 = QtGui.QWidget()
         #For decryption
@@ -67,7 +67,7 @@ class MainWindow(QtGui.QWidget):
 
         #Layouts for tabs
         p0_vertical = QtGui.QVBoxLayout(tab0)
-        p1_vertical = QtGui.QVBoxLayout(tab1) 
+        p1_vertical = QtGui.QVBoxLayout(tab1)
         p2_vertical = QtGui.QVBoxLayout(tab2)
         
         self.bar = QtGui.QStatusBar(self)
@@ -75,7 +75,7 @@ class MainWindow(QtGui.QWidget):
 
         #add tabs, name them
         self.tab_widget.addTab(tab0, "Curve")
-        self.tab_widget.addTab(tab1, "Encrypt") 
+        self.tab_widget.addTab(tab1, "Encrypt")
         self.tab_widget.addTab(tab2, "Decrypt")
         self.tab_widget.setTabEnabled(1,False)
         self.tab_widget.setTabEnabled(2,False)
@@ -114,7 +114,7 @@ class MainWindow(QtGui.QWidget):
 
         self.val_priv = QtGui.QTextEdit()
         self.val_priv.setTabChangesFocus(True)
-        
+
         self.msg_val = QtGui.QTextEdit()
         self.msg_val.setTabChangesFocus(True)
 
@@ -161,7 +161,7 @@ class MainWindow(QtGui.QWidget):
         p0_vertical.addWidget(label_c)
         p0_vertical.addWidget(self.val_c)
         p0_vertical.addWidget(label_priv)
-        p0_vertical.addWidget(self.val_priv) 
+        p0_vertical.addWidget(self.val_priv)
         p0_vertical.addWidget(button)
         p0_vertical.addWidget(publickey)
         p0_vertical.addWidget(self.public)
@@ -203,7 +203,7 @@ class MainWindow(QtGui.QWidget):
         self.encrypted_data.setMaximumHeight(label_priv.sizeHint().height()*6)
         self.encrypted_string.setMaximumHeight(label_priv.sizeHint().height()*20)
         self.decrypted_string.setMaximumHeight(label_priv.sizeHint().height()*20)
-        
+
         #Adding widgets to Tab 2
         p2_vertical.addWidget(label_key)
         p2_vertical.addWidget(self.priv_key)
@@ -216,10 +216,10 @@ class MainWindow(QtGui.QWidget):
 
         self.tab_widget.currentChanged.connect(self.current_tab_changed)
 
-        vbox = QtGui.QVBoxLayout() 
-        vbox.addWidget(self.tab_widget) 
+        vbox = QtGui.QVBoxLayout()
+        vbox.addWidget(self.tab_widget)
         vbox.addWidget(self.bar)
-        self.setLayout(vbox) 
+        self.setLayout(vbox)
 
     def current_tab_changed(self):
         if self.tab_widget.currentIndex() == 1:
@@ -242,7 +242,7 @@ class MainWindow(QtGui.QWidget):
                 self.msg_val.setText(data)
             elif value == 2:
                 self.encrypted_data.setText(data)
-    
+
     def generate_stuff(self):
         try:
             self.a = int(self.val_a.toPlainText())
@@ -298,7 +298,7 @@ class MainWindow(QtGui.QWidget):
 
         self.encrypted_string.setText(" ".join(enc_text))
 
-        with open(path, 'w+') as f:        
+        with open(path, 'w+') as f:
             f.write(" ".join(enc_text))
             message_to_show = "Encrypted. File saved at" + path 
             
@@ -339,9 +339,9 @@ class MainWindow(QtGui.QWidget):
 
         self.decrypted_string.setText("".join(final_dec))
 
-        with open(path, 'w+') as f:        
+        with open(path, 'w+') as f:
             f.write("".join(final_dec))
-            message_to_show = "Decrypted. File saved at " + path 
+            message_to_show = "Decrypted. File saved at " + path
             
         self.bar.showMessage(message_to_show)
 
@@ -352,11 +352,11 @@ class MainWindow(QtGui.QWidget):
 
 #Start window in the center of the screen
 def center(widget): 
-    screen = QtGui.QDesktopWidget().screenGeometry() 
-    size = widget.geometry() 
-    widget.move((screen.width()-size.width())/2, (screen.height()-size.height())/2) 
+    screen = QtGui.QDesktopWidget().screenGeometry()
+    size = widget.geometry()
+    widget.move((screen.width()-size.width())/2, (screen.height()-size.height())/2)
 
-app = QtGui.QApplication(sys.argv) 
-frame = MainWindow() 
-frame.show() 
+app = QtGui.QApplication(sys.argv)
+frame = MainWindow()
+frame.show()
 sys.exit(app.exec_())
