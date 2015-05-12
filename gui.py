@@ -13,11 +13,17 @@ class PopupDialog(QtGui.QDialog):
     def initUI(self):
         
         label_error = QtGui.QLabel("An error has occured!")
+        label_error.setFont(QtGui.QFont('Decorative', 10))
 
         okButton = QtGui.QPushButton("OK")
         okButton.clicked.connect(self.close)
 
         center(self)
+
+        hori = QtGui.QHBoxLayout()
+        hori.addStretch(1)
+        hori.addWidget(label_error)
+        hori.addStretch(1)
 
         hbox = QtGui.QHBoxLayout()
         hbox.addStretch(1)
@@ -25,14 +31,14 @@ class PopupDialog(QtGui.QDialog):
 
         vbox = QtGui.QVBoxLayout()
         vbox.addStretch(1)
+        vbox.addLayout(hori)
+        vbox.addStretch(1)
         vbox.addLayout(hbox)
         
         self.setLayout(vbox)    
         
-        self.setGeometry(300, 300, 300, 150)
+        self.setGeometry(300, 300, 270, 150)
         self.setWindowTitle('Error!')
-
-
 
 
 class MainWindow(QtGui.QWidget): 
@@ -88,7 +94,7 @@ class MainWindow(QtGui.QWidget):
         publickey = QtGui.QLabel("The public key is:")
 
         browseButton = QtGui.QPushButton("Browse")
-        browseButton.clicked.connect(self.showDialog)
+        browseButton.clicked.connect(lambda: self.showDialog(1))
         self.destTextField = QtGui.QTextEdit()
         self.destTextField.setMaximumHeight(label_a.sizeHint().height()*2)
         self.destTextField.setReadOnly(True)
@@ -133,7 +139,7 @@ class MainWindow(QtGui.QWidget):
         hori_box.addWidget(browseButton)
 
         browseButton2 = QtGui.QPushButton("Browse")
-        browseButton2.clicked.connect(self.showDialog2)
+        browseButton2.clicked.connect(lambda: self.showDialog(2))
 
         self.destTextField2 = QtGui.QTextEdit()
         self.destTextField2.setMaximumHeight(label_a.sizeHint().height()*2)
@@ -220,21 +226,19 @@ class MainWindow(QtGui.QWidget):
         elif self.tab_widget.currentIndex() == 0:
             self.bar.showMessage("Curve tab. You can define a new curve if you want.")
 
-    def showDialog(self):
+    def showDialog(self, value):
         fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', 'C:')
-        self.destTextField.setPlainText(fname)
+        if value == 1:
+            self.destTextField.setPlainText(fname)
+        elif value == 2:
+            self.destTextField2.setPlainText(fname)
         f = open(fname, 'r')
         with f:        
             data = f.read()
-            self.msg_val.setText(data)
-
-    def showDialog2(self):
-        fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', 'C:')
-        self.destTextField2.setPlainText(fname)
-        f = open(fname, 'r')
-        with f:        
-            data = f.read()
-            self.encrypted_data.setText(data) 
+            if value == 1:
+                self.msg_val.setText(data)
+            elif value == 2:
+                self.encrypted_data.setText(data)
     
     def generate_stuff(self):
         self.a = int(self.val_a.toPlainText())
@@ -347,5 +351,5 @@ def center(widget):
 
 app = QtGui.QApplication(sys.argv) 
 frame = MainWindow() 
-frame.popup() 
+frame.show() 
 sys.exit(app.exec_())
