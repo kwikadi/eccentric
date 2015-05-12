@@ -5,6 +5,39 @@ import elgamal
 import elliptic
 import basicfunc
 
+class MyPopupDialog(QtGui.QDialog):
+    def __init__(self, parent=None):
+        QtGui.QWidget.__init__(self)   
+        self.center()
+        self.initUI()
+
+    def initUI(self):
+        
+        label_error = QtGui.QLabel("An error has occured!")
+
+        okButton = QtGui.QPushButton("OK")
+        okButton.clicked.connect(self.close)
+
+        hbox = QtGui.QHBoxLayout()
+        hbox.addStretch(1)
+        hbox.addWidget(okButton)
+
+        vbox = QtGui.QVBoxLayout()
+        vbox.addStretch(1)
+        vbox.addLayout(hbox)
+        
+        self.setLayout(vbox)    
+        
+        self.setGeometry(300, 300, 300, 150)
+        self.setWindowTitle('Error!')
+
+    def center(self): 
+        screen = QtGui.QDesktopWidget().screenGeometry() 
+        size = self.geometry() 
+        self.move((screen.width()-size.width())/2, (screen.height()-size.height())/2)
+
+
+
 class MainWindow(QtGui.QWidget): 
     def __init__(self): 
         QtGui.QWidget.__init__(self) 
@@ -42,7 +75,7 @@ class MainWindow(QtGui.QWidget):
         self.tab_widget.setTabEnabled(2,False)
 
         #labels for Tab 1
-        eqn_label = QtGui.QLabel("Equation : (y^2)mod q = (x^3 + ax + b)mod q ")
+        eqn_label = QtGui.QLabel("Equation : y\xb2 mod q = (x\xb3 + ax + b)mod q ")
         eqn_label.setMinimumHeight(50)
         eqn_label.setAlignment(QtCore.Qt.AlignCenter)
         eqn_label.setFont(QtGui.QFont('Decorative', 13))
@@ -303,6 +336,11 @@ class MainWindow(QtGui.QWidget):
             message_to_show = "Decrypted. File saved at " + path 
             
         self.bar.showMessage(message_to_show)
+
+    def popup(self):
+        self.dialog = MyPopupDialog()
+
+        self.dialog.show()
 
     #Start window in the center of the screen
     def center(self): 
