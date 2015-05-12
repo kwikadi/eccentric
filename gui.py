@@ -5,10 +5,9 @@ import elgamal
 import elliptic
 import basicfunc
 
-class MyPopupDialog(QtGui.QDialog):
+class PopupDialog(QtGui.QDialog):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self)   
-        self.center()
         self.initUI()
 
     def initUI(self):
@@ -17,6 +16,8 @@ class MyPopupDialog(QtGui.QDialog):
 
         okButton = QtGui.QPushButton("OK")
         okButton.clicked.connect(self.close)
+
+        center(self)
 
         hbox = QtGui.QHBoxLayout()
         hbox.addStretch(1)
@@ -31,10 +32,6 @@ class MyPopupDialog(QtGui.QDialog):
         self.setGeometry(300, 300, 300, 150)
         self.setWindowTitle('Error!')
 
-    def center(self): 
-        screen = QtGui.QDesktopWidget().screenGeometry() 
-        size = self.geometry() 
-        self.move((screen.width()-size.width())/2, (screen.height()-size.height())/2)
 
 
 
@@ -48,7 +45,7 @@ class MainWindow(QtGui.QWidget):
         self.setWindowIcon(QtGui.QIcon("icon.png")) 
         self.resize(500,550) 
         self.setMinimumSize(500,550) 
-        self.center() 
+        center(self) 
          
         #Tabs in the GUI
         self.tab_widget = QtGui.QTabWidget() 
@@ -338,17 +335,17 @@ class MainWindow(QtGui.QWidget):
         self.bar.showMessage(message_to_show)
 
     def popup(self):
-        self.dialog = MyPopupDialog()
+        self.dialog = PopupDialog()
 
         self.dialog.show()
 
-    #Start window in the center of the screen
-    def center(self): 
-        screen = QtGui.QDesktopWidget().screenGeometry() 
-        size = self.geometry() 
-        self.move((screen.width()-size.width())/2, (screen.height()-size.height())/2) 
+#Start window in the center of the screen
+def center(widget): 
+    screen = QtGui.QDesktopWidget().screenGeometry() 
+    size = widget.geometry() 
+    widget.move((screen.width()-size.width())/2, (screen.height()-size.height())/2) 
 
 app = QtGui.QApplication(sys.argv) 
 frame = MainWindow() 
-frame.show() 
+frame.popup() 
 sys.exit(app.exec_())
