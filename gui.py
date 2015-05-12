@@ -12,8 +12,8 @@ class PopupDialog(QtGui.QDialog):
 
     def initUI(self):
         
-        label_error = QtGui.QLabel("An error has occured!")
-        label_error.setFont(QtGui.QFont('Decorative', 10))
+        self.label_error = QtGui.QLabel()
+        self.label_error.setFont(QtGui.QFont('Decorative', 10))
 
         okButton = QtGui.QPushButton("OK")
         okButton.clicked.connect(self.close)
@@ -22,7 +22,7 @@ class PopupDialog(QtGui.QDialog):
 
         hori = QtGui.QHBoxLayout()
         hori.addStretch(1)
-        hori.addWidget(label_error)
+        hori.addWidget(self.label_error)
         hori.addStretch(1)
 
         hbox = QtGui.QHBoxLayout()
@@ -39,6 +39,9 @@ class PopupDialog(QtGui.QDialog):
         
         self.setGeometry(300, 300, 270, 150)
         self.setWindowTitle('Error!')
+
+    def setval(self, errorval):
+        self.label_error.setText(errorval)
 
 
 class MainWindow(QtGui.QWidget): 
@@ -241,15 +244,19 @@ class MainWindow(QtGui.QWidget):
                 self.encrypted_data.setText(data)
     
     def generate_stuff(self):
-        self.a = int(self.val_a.toPlainText())
-        self.b = int(self.val_b.toPlainText())
-        self.q = int(self.val_c.toPlainText())
-        self.priv = int(self.val_priv.toPlainText())
+        try:
+            self.a = int(self.val_a.toPlainText())
+            self.b = int(self.val_b.toPlainText())
+            self.q = int(self.val_c.toPlainText())
+            self.priv = int(self.val_priv.toPlainText())
+        except:
+            self.popup("Please input numbers in the fields!")
+            return
+
         self.ec = elliptic.EC(self.a, self.b, self.q)
         for i in range(1,self.q):
             self.g, _ = self.ec.at(i)
             if self.g is not False and self.ec.order(self.g) <= self.ec.q and self.ec.order(self.g) > 127:
-                #print ec.order(g)
                 break
         #print "Over"
         self.eg = elgamal.ElGamal(self.ec, self.g)
@@ -338,9 +345,9 @@ class MainWindow(QtGui.QWidget):
             
         self.bar.showMessage(message_to_show)
 
-    def popup(self):
+    def popup(self, errorval):
         self.dialog = PopupDialog()
-
+        self.dialog.setval(errorval)
         self.dialog.show()
 
 #Start window in the center of the screen
