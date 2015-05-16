@@ -1,9 +1,7 @@
 import os, sys
 from PyQt4 import QtGui, QtCore
 import collections
-import elgamal
-import elliptic
-import basicfunc
+import encdec
 
 class PopupDialog(QtGui.QDialog):
     def __init__(self, parent=None):
@@ -252,67 +250,47 @@ class MainWindow(QtGui.QWidget):
         except:
             self.popup("Please input numbers in the fields!")
             return
-
-        self.ec = elliptic.EC(self.a, self.b, self.q)
-        for i in range(1,self.q):
-            self.g, _ = self.ec.at(i)
-            if self.g is not False and self.ec.order(self.g) <= self.ec.q and self.ec.order(self.g) > 127:
-                break
-        #print "Over"
-        self.eg = elgamal.ElGamal(self.ec, self.g)
-        self.pub = self.eg.gen(self.priv,self.g)
-        self.public.setText(str(self.pub[0]) + " " + str(self.pub[1]))
-        self.mapping = [self.ec.mul(self.g, i) for i in range(self.eg.n)]
+        self.ed = encdec.Values()
+        key = self.ed.public_key(self.a, self.b, self.q, self.priv)
+        self.public.setText(key)     
         self.tab_widget.setTabEnabled(1,True)
         self.tab_widget.setTabEnabled(2,True)
         self.bar.showMessage("Curve defined! Move to Encrypt or Decrypt tabs for more.")
 
     def encrypt_data(self):
+        try:
+            pub_raw = str(self.val_pub.toPlainText())
+            message = self.msg_val.toPlainText()
+        except:
+            self.popup("Something's wrong, I can feel it.")
+            return
         self.bar.showMessage("Encrypting...")
-        pub_raw = str(self.val_pub.toPlainText())
-        pub1_list = pub_raw.split()
-        pub1 = int(pub1_list[0])
-        pub2 = int(pub1_list[1])
-        publ = basicfunc.Coord(pub1,pub2)
-        message = self.msg_val.toPlainText()
+
         path = 'encrypted.txt'
         path_acq = str(self.destTextField.toPlainText())
         if path_acq:
             index_path = path_acq.rfind(".")
             if index_path != -1:
                 path = path_acq[:index_path] + ".enc." + path_acq[index_path+1:]
-        mapped = []
-        for char in message:
-            mapped.append(self.mapping[ord(str(char))])
-
-        cipher = []
-        for plain in mapped:
-            cipher.append(self.eg.enc(plain, publ, self.g, 15))
-
-        enc_text = []
-        for single in cipher:
-            enc_text.append(str(single[0][0]))
-            enc_text.append(str(single[0][1]))
-            enc_text.append(str(single[1][0]))
-            enc_text.append(str(single[1][1]))
-
-        self.encrypted_string.setText(" ".join(enc_text))
+       
+        encrypted_text = self.ed.encryption(pub_raw, message)
+        self.encrypted_string.setText(encrypted_text)
 
         with open(path, 'w+') as f:
-            f.write(" ".join(enc_text))
-            message_to_show = "Encrypted. File saved at" + path 
+            f.write(encrypted_text)
+            message_to_show = "Encrypted. File saved at " + path 
             
         self.bar.showMessage(message_to_show)
             
 
     def decrypt_data(self):
-        self.bar.showMessage("Decrypting...")
-        private_key = int(self.priv_key.toPlainText())
-        cipher_raw = str(self.encrypted_data.toPlainText())
-        cipher_raw_list = cipher_raw.split()
-        cipher_super = []
-        cipher_final = []
-        decrypted = []
+        try:
+            private_key = int(self.priv_key.toPlainText())
+            cipher_raw = str(self.encrypted_data.toPlainText())
+        except:
+            self.popup("Error encountered. Please call Vodafone.")
+            return
+        self.bar.showMessage("Decrypting...")        
         path_acq = str(self.destTextField2.toPlainText())
         path = 'decrypted.txt'
         if path_acq:
@@ -324,23 +302,11 @@ class MainWindow(QtGui.QWidget):
                 if index_path != -1:
                     path = path_acq[:index_path] + ".dec." + path_acq[index_path+1:]
 
-        for i,k in zip(cipher_raw_list[0::2], cipher_raw_list[1::2]):
-            cipher_super.append(basicfunc.Coord(int(i), int(k)))
-
-        for i,k in zip(cipher_super[0::2], cipher_super[1::2]):
-            cipher_final.append((i,k))
-
-        for ciphers in cipher_final:
-            decrypted.append(self.eg.dec(ciphers, private_key, self.ec))
-
-        final_dec = []
-        for dec in decrypted:
-            final_dec.append(unichr(self.mapping.index(dec)))
-
-        self.decrypted_string.setText("".join(final_dec))
+        finalval = self.ed.decryption(private_key, cipher_raw)
+        self.decrypted_string.setText(finalval)
 
         with open(path, 'w+') as f:
-            f.write("".join(final_dec))
+            f.write(finalval)
             message_to_show = "Decrypted. File saved at " + path
             
         self.bar.showMessage(message_to_show)
