@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, time
 from PyQt4 import QtGui, QtCore
 import collections
 import encdec
@@ -70,6 +70,8 @@ class MainWindow(QtGui.QWidget):
         
         self.bar = QtGui.QStatusBar(self)
         self.bar.showMessage("Ready. Define curve to begin.")
+
+        self.clipboard = QtGui.QApplication.clipboard()
 
         #add tabs, name them
         self.tab_widget.addTab(tab0, "Curve")
@@ -255,6 +257,9 @@ class MainWindow(QtGui.QWidget):
         self.public.setText(key)     
         self.tab_widget.setTabEnabled(1,True)
         self.tab_widget.setTabEnabled(2,True)
+        self.clipboard.setText(key)
+        self.bar.showMessage("Public key copied to clipboard!")
+        time.sleep(2)
         self.bar.showMessage("Curve defined! Move to Encrypt or Decrypt tabs for more.")
 
     def encrypt_data(self):
