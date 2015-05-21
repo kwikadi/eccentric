@@ -30,9 +30,10 @@ class Values():
             cipher.append(self.eg.enc(plain, publ, self.g, 15))
 
         enc_text = []
-        for single in cipher:
-            enc_text.append(str(single[0][0]))
-            enc_text.append(str(single[0][1]))
+        for val, single in enumerate(cipher):
+            if val == 0:
+                enc_text.append(str(single[0][0]))
+                enc_text.append(str(single[0][1]))
             enc_text.append(str(single[1][0]))
             enc_text.append(str(single[1][1]))
 
@@ -42,21 +43,17 @@ class Values():
     def decryption(self, private_key, cipher_raw):
         cipher_raw_list = cipher_raw.split()
         cipher_super = []
-        cipher_final = []
         decrypted = []
-        
-        for i,k in zip(cipher_raw_list[0::2], cipher_raw_list[1::2]):
+        key = basicfunc.Coord(int(cipher_raw_list[0]), int(cipher_raw_list[1]))
+
+        for i,k in zip(cipher_raw_list[2::2], cipher_raw_list[3::2]):
             cipher_super.append(basicfunc.Coord(int(i), int(k)))
 
-        for i,k in zip(cipher_super[0::2], cipher_super[1::2]):
-            cipher_final.append((i,k))
-
-        for ciphers in cipher_final:
-            decrypted.append(self.eg.dec(ciphers, private_key, self.ec))
+        for cipher in cipher_super:
+            decrypted.append(self.eg.dec((key,cipher), private_key, self.ec))
 
         final_dec = []
         for dec in decrypted:
             final_dec.append(unichr(self.mapping.index(dec)))
 
         return "".join(final_dec)
-
