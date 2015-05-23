@@ -10,10 +10,14 @@ class Values():
             if self.g is not False and self.ec.order(self.g) <= self.ec.q and self.ec.order(self.g) > 127:
                 break
         self.eg = elgamal.ElGamal(self.ec, self.g)
-        pub = self.eg.gen(priv,self.g)
-        return_for_public = str(pub[0]) + " " + str(pub[1])
         self.mapping = [self.ec.mul(self.g, i) for i in range(self.eg.n)]
-        return return_for_public
+        if priv != -1:
+            pub = self.eg.gen(priv,self.g)
+            return_for_public = str(pub[0]) + " " + str(pub[1])
+            return return_for_public
+        else:
+            return None
+
 
     def encryption(self, pub_raw, message):
         pub1_list = pub_raw.split()

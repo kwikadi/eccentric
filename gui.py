@@ -71,8 +71,6 @@ class MainWindow(QtGui.QWidget):
         self.bar = QtGui.QStatusBar(self)
         self.bar.showMessage("Ready. Define curve to begin.")
 
-        self.clipboard = QtGui.QApplication.clipboard()
-
         #add tabs, name them
         self.tab_widget.addTab(tab0, "Curve")
         self.tab_widget.addTab(tab1, "Encrypt")
@@ -224,8 +222,12 @@ class MainWindow(QtGui.QWidget):
     def current_tab_changed(self):
         if self.tab_widget.currentIndex() == 1:
             self.bar.showMessage("Encrypt Tab. Ready.")
+            if self.key is not None:
+                self.val_pub.setText(self.key)
         elif self.tab_widget.currentIndex() == 2:
             self.bar.showMessage("Decrypt Tab. Ready.")
+            if self.priv != -1:
+                self.priv_key.setText(str(self.priv))
         elif self.tab_widget.currentIndex() == 0:
             self.bar.showMessage("Curve tab. You can define a new curve if you want.")
 
@@ -248,19 +250,23 @@ class MainWindow(QtGui.QWidget):
             self.a = int(self.val_a.toPlainText())
             self.b = int(self.val_b.toPlainText())
             self.q = int(self.val_c.toPlainText())
-            self.priv = int(self.val_priv.toPlainText())
         except:
             self.popup("Please input numbers in the fields!")
             return
+        try:
+            self.priv = int(self.val_priv.toPlainText())
+        except:
+            self.priv = -1
         self.ed = encdec.Values()
-        key = self.ed.public_key(self.a, self.b, self.q, self.priv)
-        self.public.setText(key)     
-        self.tab_widget.setTabEnabled(1,True)
-        self.tab_widget.setTabEnabled(2,True)
-        self.clipboard.setText(key)
-        self.bar.showMessage("Public key copied to clipboard!")
-        time.sleep(2)
-        self.bar.showMessage("Curve defined! Move to Encrypt or Decrypt tabs for more.")
+        self.key = self.ed.public_key(self.a, self.b, self.q, self.priv)
+        if self.key is not None:
+            self.public.setText(self.key)     
+            self.tab_widget.setTabEnabled(1,True)
+            self.tab_widget.setTabEnabled(2,True)
+            self.bar.showMessage("Curve defined! Move to Encrypt or Decrypt tabs for more.")
+        else:
+            self.tab_widget.setTabEnabled(2,True)
+            self.bar.showMessage("No private key entered. Only decryption possible.")
 
     def encrypt_data(self):
         try:
