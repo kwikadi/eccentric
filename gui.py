@@ -86,8 +86,8 @@ class MainWindow(QtGui.QWidget):
 
         label_a = QtGui.QLabel("Enter value of a:")
         label_b = QtGui.QLabel("Enter value of b:")
-        label_c = QtGui.QLabel("Enter value of q:")
-        label_priv = QtGui.QLabel("Enter the private key:")
+        label_c = QtGui.QLabel("Enter value of q (Prime number):")
+        label_priv = QtGui.QLabel("Enter the private key (Not necesary):")
         label_message = QtGui.QLabel("Enter the message you want to encrypt:")
         label_pub = QtGui.QLabel("Enter public key of recipient:")
         label_encrypted = QtGui.QLabel("The encrypted data is:")
@@ -251,7 +251,7 @@ class MainWindow(QtGui.QWidget):
             self.b = int(self.val_b.toPlainText())
             self.q = int(self.val_c.toPlainText())
         except:
-            self.popup("Please input numbers in the fields!")
+            self.popup("Please input numbers in the necessary fields!")
             return
         try:
             self.priv = int(self.val_priv.toPlainText())
@@ -260,13 +260,10 @@ class MainWindow(QtGui.QWidget):
         self.ed = encdec.Values()
         self.key = self.ed.public_key(self.a, self.b, self.q, self.priv)
         if self.key is not None:
-            self.public.setText(self.key)     
-            self.tab_widget.setTabEnabled(1,True)
-            self.tab_widget.setTabEnabled(2,True)
-            self.bar.showMessage("Curve defined! Move to Encrypt or Decrypt tabs for more.")
-        else:
-            self.tab_widget.setTabEnabled(2,True)
-            self.bar.showMessage("No private key entered. Only decryption possible.")
+            self.public.setText(self.key)
+        self.tab_widget.setTabEnabled(1,True)
+        self.tab_widget.setTabEnabled(2,True)
+        self.bar.showMessage("Curve defined! Move to Encrypt or Decrypt tabs for more.")
 
     def encrypt_data(self):
         try:
