@@ -79,7 +79,7 @@ class MainWindow(QtGui.QWidget):
         self.tab_widget.setTabEnabled(2,False)
 
         #labels for Tab 1
-        eqn_label = QtGui.QLabel("Equation : y\xb2 mod q = (x\xb3 + ax + b)mod q ")
+        eqn_label = QtGui.QLabel("Equation : y\xb2 mod q = (x\xb3 + ax + b) mod q ")
         eqn_label.setMinimumHeight(50)
         eqn_label.setAlignment(QtCore.Qt.AlignCenter)
         eqn_label.setFont(QtGui.QFont('Decorative', 13))
@@ -130,10 +130,10 @@ class MainWindow(QtGui.QWidget):
 
         #button for curve generation, accompanying Label
         button = QtGui.QPushButton("Generate Curve")
-        button.clicked.connect(self.generate_stuff)
+        button.clicked.connect(self.generateCurve)
 
         button_enc = QtGui.QPushButton("Encrypt Data")
-        button_enc.clicked.connect(self.encrypt_data)
+        button_enc.clicked.connect(self.encryptData)
 
         hori_box = QtGui.QHBoxLayout()
         hori_box.addWidget(self.destTextField)
@@ -180,7 +180,7 @@ class MainWindow(QtGui.QWidget):
 
         #Buttons for Tab 2
         button_dec = QtGui.QPushButton("Decrypt Data")
-        button_dec.clicked.connect(self.decrypt_data)
+        button_dec.clicked.connect(self.decryptData)
 
         #Textboxes for Tab 2
         self.priv_key = QtGui.QTextEdit()
@@ -212,22 +212,28 @@ class MainWindow(QtGui.QWidget):
         p2_vertical.addWidget(label_decrypted)
         p2_vertical.addWidget(self.decrypted_string)
 
-        self.tab_widget.currentChanged.connect(self.current_tab_changed)
+        self.tab_widget.currentChanged.connect(self.currentTabChanged)
 
         vbox = QtGui.QVBoxLayout()
         vbox.addWidget(self.tab_widget)
         vbox.addWidget(self.bar)
         self.setLayout(vbox)
 
-    def current_tab_changed(self):
+    def currentTabChanged(self):
         if self.tab_widget.currentIndex() == 1:
             self.bar.showMessage("Encrypt Tab. Ready.")
             if self.key is not None:
                 self.val_pub.setText(self.key)
+            else:
+                self.val_pub.setText("")
+            self.val_pub.clearFocus()
         elif self.tab_widget.currentIndex() == 2:
             self.bar.showMessage("Decrypt Tab. Ready.")
             if self.priv != -1:
                 self.priv_key.setText(str(self.priv))
+            else:
+                self.priv_key.setText("")
+            self.priv_key.clearFocus()
         elif self.tab_widget.currentIndex() == 0:
             self.bar.showMessage("Curve tab. You can define a new curve if you want.")
 
@@ -245,7 +251,7 @@ class MainWindow(QtGui.QWidget):
             elif value == 2:
                 self.encrypted_data.setText(data)
 
-    def generate_stuff(self):
+    def generateCurve(self):
         try:
             self.a = int(self.val_a.toPlainText())
             self.b = int(self.val_b.toPlainText())
@@ -253,19 +259,18 @@ class MainWindow(QtGui.QWidget):
         except:
             self.popup("Please input numbers in the necessary fields!")
             return
-        try:
-            self.priv = int(self.val_priv.toPlainText())
-        except:
-            self.priv = -1
+        self.priv = int(self.val_priv.toPlainText() or -1)
         self.ed = encdec.Values()
         self.key = self.ed.public_key(self.a, self.b, self.q, self.priv)
         if self.key is not None:
             self.public.setText(self.key)
+        else:
+            self.public.setText("")
         self.tab_widget.setTabEnabled(1,True)
         self.tab_widget.setTabEnabled(2,True)
         self.bar.showMessage("Curve defined! Move to Encrypt or Decrypt tabs for more.")
 
-    def encrypt_data(self):
+    def encryptData(self):
         try:
             pub_raw = str(self.val_pub.toPlainText())
             message = self.msg_val.toPlainText()
@@ -291,7 +296,7 @@ class MainWindow(QtGui.QWidget):
         self.bar.showMessage(message_to_show)
             
 
-    def decrypt_data(self):
+    def decryptData(self):
         try:
             private_key = int(self.priv_key.toPlainText())
             cipher_raw = str(self.encrypted_data.toPlainText())
