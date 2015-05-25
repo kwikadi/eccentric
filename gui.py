@@ -94,6 +94,9 @@ class MainWindow(QtGui.QWidget):
         label_decrypted = QtGui.QLabel("The decrypted data is:")
         publickey = QtGui.QLabel("The public key is:")
 
+        self.write_encrypted = QtGui.QCheckBox("Write encrypted data to file")
+        self.write_decrypted = QtGui.QCheckBox("Write decrypted data to file")
+
         browseButton = QtGui.QPushButton("Browse")
         browseButton.clicked.connect(lambda: self.showDialog(1))
         self.destTextField = QtGui.QTextEdit()
@@ -170,6 +173,7 @@ class MainWindow(QtGui.QWidget):
         p1_vertical.addWidget(label_message)
         p1_vertical.addLayout(hori_box)
         p1_vertical.addWidget(self.msg_val)
+        p1_vertical.addWidget(self.write_encrypted)
         p1_vertical.addWidget(button_enc)
         p1_vertical.addWidget(label_encrypted)
         p1_vertical.addWidget(self.encrypted_string)
@@ -208,6 +212,7 @@ class MainWindow(QtGui.QWidget):
         p2_vertical.addWidget(label_enc_message)
         p2_vertical.addLayout(hori_box2)
         p2_vertical.addWidget(self.encrypted_data)
+        p2_vertical.addWidget(self.write_decrypted)
         p2_vertical.addWidget(button_dec)
         p2_vertical.addWidget(label_decrypted)
         p2_vertical.addWidget(self.decrypted_string)
@@ -239,10 +244,12 @@ class MainWindow(QtGui.QWidget):
 
     def showDialog(self, value):
         fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', 'C:')
-        if value == 1:
+        if value == 1 and fname:
             self.destTextField.setPlainText(fname)
-        elif value == 2:
+            self.write_encrypted.setCheckState(2)
+        elif value == 2 and fname:
             self.destTextField2.setPlainText(fname)
+            self.write_decrypted.setCheckState(2)
         f = open(fname, 'r')
         with f:        
             data = f.read()
