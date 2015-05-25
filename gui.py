@@ -285,20 +285,23 @@ class MainWindow(QtGui.QWidget):
             self.popup("Something's wrong, I can feel it.")
             return
         self.bar.showMessage("Encrypting...")
-
-        path = 'encrypted.txt'
-        path_acq = str(self.destTextField.toPlainText())
-        if path_acq:
-            index_path = path_acq.rfind(".")
-            if index_path != -1:
-                path = path_acq[:index_path] + ".enc." + path_acq[index_path+1:]
-       
+        
         encrypted_text = self.ed.encryption(pub_raw, message)
         self.encrypted_string.setText(encrypted_text)
+        
+        message_to_show = "Encrypted!"
 
-        with open(path, 'w+') as f:
-            f.write(encrypted_text)
-            message_to_show = "Encrypted. File saved at " + path 
+        if self.write_encrypted.isChecked():
+            path = 'encrypted.txt'
+            path_acq = str(self.destTextField.toPlainText())
+            if path_acq:
+                index_path = path_acq.rfind(".")
+                if index_path != -1:
+                    path = path_acq[:index_path] + ".enc." + path_acq[index_path+1:]
+
+            with open(path, 'w+') as f:
+                f.write(encrypted_text)
+                message_to_show = "Encrypted. File saved at " + path 
             
         self.bar.showMessage(message_to_show)
             
@@ -310,24 +313,28 @@ class MainWindow(QtGui.QWidget):
         except:
             self.popup("Error encountered. Please call Vodafone.")
             return
-        self.bar.showMessage("Decrypting...")        
-        path_acq = str(self.destTextField2.toPlainText())
-        path = 'decrypted.txt'
-        if path_acq:
-            index_path = path_acq.rfind(".enc")
-            if index_path != -1:
-                path = path_acq[:index_path] + ".dec" + path_acq[index_path+4:]
-            else:
-                index_path = path_acq.rfind(".")
-                if index_path != -1:
-                    path = path_acq[:index_path] + ".dec." + path_acq[index_path+1:]
+        self.bar.showMessage("Decrypting...")
 
         finalval = self.ed.decryption(private_key, cipher_raw)
         self.decrypted_string.setText(finalval)
 
-        with open(path, 'w+') as f:
-            f.write(finalval)
-            message_to_show = "Decrypted. File saved at " + path
+        message_to_show = "Decrypted!"
+        
+        if self.write_decrypted.isChecked():
+            path_acq = str(self.destTextField2.toPlainText())
+            path = 'decrypted.txt'
+            if path_acq:
+                index_path = path_acq.rfind(".enc")
+                if index_path != -1:
+                    path = path_acq[:index_path] + ".dec" + path_acq[index_path+4:]
+                else:
+                    index_path = path_acq.rfind(".")
+                    if index_path != -1:
+                        path = path_acq[:index_path] + ".dec." + path_acq[index_path+1:]
+
+            with open(path, 'w+') as f:
+                f.write(finalval)
+                message_to_show = "Decrypted. File saved at " + path
             
         self.bar.showMessage(message_to_show)
 
