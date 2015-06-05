@@ -11,3 +11,7 @@ Tested on Windows 8.1 and Ubuntu
 ```
 python gui.py 
 ```
+
+TODO:
+Appropriate error messages for incorrect values of a, b, and keys. 
+(Hint: Try a=23, b=34, q=277 and private key=35 for flawless working)
