@@ -268,7 +268,10 @@ class MainWindow(QtGui.QWidget):
             return
         self.priv = int(self.val_priv.toPlainText() or -1)
         self.ed = encdec.Values()
-        self.key = self.ed.public_key(self.a, self.b, self.q, self.priv)
+        try:
+            self.key = self.ed.public_key(self.a, self.b, self.q, self.priv)
+        except:
+            self.popup("Not a valid curve! Please define a valid curve.")
         if self.key is not None:
             self.public.setText(self.key)
         else:
