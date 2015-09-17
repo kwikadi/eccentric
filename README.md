@@ -1,5 +1,6 @@
-# EllipticCurveCryptography-ElGamal
-ECC-ElGamal, with front end in pyqt
+# ECCentric
+
+ECC-ElGamal implementation in python, with front end in pyqt
 
 ![Properties](/screenshot.png)
 
